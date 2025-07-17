@@ -363,17 +363,14 @@ export const StepSix = ({ userData, onNext }: StepSixProps) => {
                         {/* Audio Player */}
                         {message.showAudio && (
                           <div className="mt-4">
-                            <div className="bg-gray-100 rounded-lg p-3 flex items-center gap-3">
-                              <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
-                                <div className="w-0 h-0 border-l-[6px] border-l-primary border-y-[4px] border-y-transparent ml-0.5"></div>
-                              </div>
-                              <div className="flex-1">
-                                <div className="h-1 bg-gray-300 rounded-full">
-                                  <div className="h-1 bg-primary rounded-full w-1/3"></div>
-                                </div>
-                              </div>
-                              <span className="text-sm text-gray-600">0:32 / -0:02</span>
-                            </div>
+                            <audio 
+                              controls 
+                              className="w-full"
+                              src="https://upcdn.io/223k2Jt/audio/zoq2z6ci5j8r899exz5tz56g.mp3?f=mp3"
+                              preload="metadata"
+                            >
+                              Seu navegador não suporta áudio.
+                            </audio>
                           </div>
                         )}
 
