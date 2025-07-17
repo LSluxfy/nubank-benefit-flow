@@ -9,7 +9,15 @@ export const Header = () => {
       <div className="flex items-center justify-between px-4 py-3">
         {/* Logo */}
         <div className="flex items-center gap-4">
-          <img src="/lovable-uploads/b480eeec-32ae-4bc1-abc6-aa371f604112.png" alt="Nubank" className="h-16" />
+          <img 
+            src="/lovable-uploads/b480eeec-32ae-4bc1-abc6-aa371f604112.png" 
+            alt="Nubank" 
+            className="h-16" 
+            onError={(e) => {
+              console.log('Erro ao carregar logo no header');
+              e.currentTarget.src = 'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=200&h=100&fit=crop';
+            }}
+          />
         </div>
 
         {/* Right Icons */}
