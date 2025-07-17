@@ -12,6 +12,7 @@ export const StepFour = ({ userData, onNext }: StepFourProps) => {
   const [isPressed, setIsPressed] = useState(false);
   const [progress, setProgress] = useState(0);
   const [isComplete, setIsComplete] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
@@ -21,7 +22,12 @@ export const StepFour = ({ userData, onNext }: StepFourProps) => {
         setProgress(prev => {
           const newProgress = prev + 1.5; // Slower progress for longer hold
           if (newProgress >= 100) {
-            setIsComplete(true);
+            setIsProcessing(true);
+            // Start processing animation for 2 seconds, then complete
+            setTimeout(() => {
+              setIsProcessing(false);
+              setIsComplete(true);
+            }, 2000);
             return 100;
           }
           return newProgress;
@@ -67,6 +73,47 @@ export const StepFour = ({ userData, onNext }: StepFourProps) => {
     e.stopPropagation();
     console.log('Button clicked');
   }, []);
+
+  if (isProcessing) {
+    return (
+      <div className="container mx-auto px-4 py-8 max-w-md">
+        <Card className="border-0 shadow-lg">
+          <CardContent className="pt-12 pb-8">
+            <div className="text-center space-y-8">
+              <div className="w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center mx-auto relative">
+                <div className="w-20 h-20 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+                <Fingerprint className="w-8 h-8 text-blue-600 absolute" />
+              </div>
+
+              <div className="space-y-4">
+                <h2 className="text-2xl font-bold text-blue-600">Processando dados...</h2>
+                <div className="space-y-2">
+                  <div className="text-sm text-muted-foreground animate-pulse">
+                    ✓ Verificando identidade biométrica
+                  </div>
+                  <div className="text-sm text-muted-foreground animate-pulse delay-300">
+                    ✓ Validando informações pessoais
+                  </div>
+                  <div className="text-sm text-muted-foreground animate-pulse delay-500">
+                    ✓ Confirmando dados bancários
+                  </div>
+                  <div className="text-sm text-muted-foreground animate-pulse delay-700">
+                    ✓ Finalizando verificação
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-blue-50 p-4 rounded-lg">
+                <p className="text-sm text-blue-700">
+                  Aguarde enquanto processamos suas informações de forma segura...
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   if (isComplete) {
     return (

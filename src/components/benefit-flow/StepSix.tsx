@@ -219,8 +219,12 @@ export const StepSix = ({ userData, onNext }: StepSixProps) => {
                   </Avatar>
                   <div className="flex-1">
                     <Card className="border-0 shadow-sm">
-                      <CardContent className="p-4">
-                        <div className="text-sm leading-relaxed">
+                      <CardContent className="p-3 sm:p-4">
+                        <div className={`text-sm leading-relaxed ${
+                          message.id === 10 || message.id === 12 
+                            ? 'text-xs sm:text-sm' 
+                            : ''
+                        }`}>
                           {formatMessageContent(message.content)}
                         </div>
 
