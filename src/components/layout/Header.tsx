@@ -9,7 +9,7 @@ export const Header = () => {
       <div className="flex items-center justify-between px-4 py-3">
         {/* Logo */}
         <div className="flex items-center gap-4">
-          <img src={nubankLogo} alt="Nubank" className="h-8" />
+          <img src={nubankLogo} alt="Nubank" className="h-12" />
         </div>
 
         {/* Right Icons */}
