@@ -7,7 +7,13 @@ export const Footer = () => {
       <div className="px-6 py-12">
         {/* Nu Logo and Description */}
         <div className="text-center mb-12">
-          <div className="text-4xl font-bold mb-6">nu</div>
+          <div className="mb-6 flex justify-center">
+            <img 
+              src="/lovable-uploads/d77c0f95-49a4-44f1-b43d-a78f07873cb8.png" 
+              alt="Nu logo" 
+              className="h-16 w-auto filter brightness-0 invert"
+            />
+          </div>
           <p className="text-white/90 text-lg max-w-md mx-auto leading-relaxed">
             Banco digital que simplifica sua vida financeira e oferece as melhores soluções para você.
           </p>
