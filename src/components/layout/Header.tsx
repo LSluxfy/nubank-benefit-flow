@@ -8,7 +8,7 @@ export const Header = () => {
       <div className="flex items-center justify-between px-4 py-3">
         {/* Logo */}
         <div className="flex items-center gap-4">
-          <div className="text-3xl font-bold text-primary">nu</div>
+          <div className="text-3xl font-bold" style={{ color: '#8A05BE' }}>nu</div>
         </div>
 
         {/* Right Icons */}

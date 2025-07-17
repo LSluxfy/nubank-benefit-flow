@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Avatar } from '@/components/ui/avatar';
 import { CheckCircle, Phone, Loader2 } from 'lucide-react';
 import { UserData } from '../BenefitFlow';
+import nubankRepresentative from '@/assets/nubank-representative.jpg';
 
 interface StepSixProps {
   userData: UserData;
@@ -214,8 +215,8 @@ export const StepSix = ({ userData, onNext }: StepSixProps) => {
               <div key={message.id} className="space-y-4">
                 {/* Bot Message */}
                 <div className="flex gap-3">
-                  <Avatar className="w-10 h-10 bg-primary text-white">
-                    <span className="text-sm font-bold">nu</span>
+                  <Avatar className="w-10 h-10">
+                    <img src={nubankRepresentative} alt="Nubank Representative" className="w-full h-full object-cover rounded-full" />
                   </Avatar>
                   <div className="flex-1">
                     <Card className="border-0 shadow-sm">
@@ -351,8 +352,8 @@ export const StepSix = ({ userData, onNext }: StepSixProps) => {
           {/* Typing Indicator */}
           {isTyping && (
             <div className="flex gap-3">
-              <Avatar className="w-10 h-10 bg-primary text-white">
-                <span className="text-sm font-bold">nu</span>
+              <Avatar className="w-10 h-10">
+                <img src={nubankRepresentative} alt="Nubank Representative" className="w-full h-full object-cover rounded-full" />
               </Avatar>
               <div className="flex-1">
                 <Card className="border-0 shadow-sm">
@@ -402,8 +403,8 @@ export const StepSix = ({ userData, onNext }: StepSixProps) => {
           {/* Final Step */}
           {showFinalStep && (
             <div className="flex gap-3">
-              <Avatar className="w-10 h-10 bg-primary text-white">
-                <span className="text-sm font-bold">nu</span>
+              <Avatar className="w-10 h-10">
+                <img src={nubankRepresentative} alt="Nubank Representative" className="w-full h-full object-cover rounded-full" />
               </Avatar>
               <div className="flex-1">
                 <Card className="border-0 shadow-sm">
