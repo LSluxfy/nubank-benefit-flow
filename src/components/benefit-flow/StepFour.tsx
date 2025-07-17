@@ -5,9 +5,10 @@ import { UserData } from '../BenefitFlow';
 
 interface StepFourProps {
   userData: UserData;
+  onNext: () => void;
 }
 
-export const StepFour = ({ userData }: StepFourProps) => {
+export const StepFour = ({ userData, onNext }: StepFourProps) => {
   const [isPressed, setIsPressed] = useState(false);
   const [progress, setProgress] = useState(0);
   const [isComplete, setIsComplete] = useState(false);
@@ -90,6 +91,13 @@ export const StepFour = ({ userData }: StepFourProps) => {
                   Você receberá uma notificação quando o benefício estiver disponível.
                 </p>
               </div>
+
+              <button
+                onClick={onNext}
+                className="w-full mt-6 bg-primary text-white py-3 px-6 rounded-lg font-medium hover:bg-primary/90 transition-colors"
+              >
+                Continuar
+              </button>
             </div>
           </CardContent>
         </Card>
