@@ -69,9 +69,11 @@ export const EnhancedLogo = ({
   if (variant === 'nubank') {
     return (
       <div className={`${sizeClasses[size]} ${className} flex items-center justify-center`}>
-        <span className={`font-bold text-primary ${textSizeClasses[size]} leading-none`}>
-          nu
-        </span>
+        <img 
+          src="/lovable-uploads/90ce4c59-e58b-4c76-93fd-3ca503c33c8c.png" 
+          alt={alt}
+          className={`${sizeClasses[size]} object-contain`}
+        />
       </div>
     );
   }
