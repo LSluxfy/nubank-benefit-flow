@@ -2,11 +2,12 @@ import { useState, useEffect } from 'react';
 import { removeBackground, loadImage } from '@/utils/backgroundRemoval';
 
 interface EnhancedLogoProps {
-  src: string;
+  src?: string;
   alt: string;
   className?: string;
   size?: 'sm' | 'md' | 'lg' | 'xl';
   removeBackground?: boolean;
+  variant?: 'nubank' | 'image';
 }
 
 const sizeClasses = {
@@ -16,17 +17,27 @@ const sizeClasses = {
   xl: 'w-20 h-20'
 };
 
+const textSizeClasses = {
+  sm: 'text-lg',
+  md: 'text-2xl', 
+  lg: 'text-4xl',
+  xl: 'text-5xl'
+};
+
 export const EnhancedLogo = ({ 
   src, 
   alt, 
   className = '', 
   size = 'md',
-  removeBackground: shouldRemoveBackground = false 
+  removeBackground: shouldRemoveBackground = false,
+  variant = 'nubank'
 }: EnhancedLogoProps) => {
   const [processedSrc, setProcessedSrc] = useState(src);
   const [isProcessing, setIsProcessing] = useState(false);
 
   const processImage = async () => {
+    if (!src) return;
+    
     try {
       setIsProcessing(true);
       
@@ -49,11 +60,25 @@ export const EnhancedLogo = ({
   };
 
   useEffect(() => {
-    if (shouldRemoveBackground) {
+    if (shouldRemoveBackground && src) {
       processImage();
     }
   }, [src, shouldRemoveBackground]);
 
+  // Render Nubank-style logo
+  if (variant === 'nubank') {
+    return (
+      <div className={`${sizeClasses[size]} ${className} flex items-center justify-center`}>
+        <span className={`font-bold text-primary ${textSizeClasses[size]} leading-none`}>
+          nu
+        </span>
+      </div>
+    );
+  }
+
+  // Render image logo
+  if (!src) return null;
+  
   return (
     <img 
       src={processedSrc} 
