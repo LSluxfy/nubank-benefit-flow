@@ -22,46 +22,57 @@ export const StepTwo = ({ onNext, userData, updateUserData }: StepTwoProps) => {
   ];
 
   useEffect(() => {
+    let isMounted = true;
+    
     // Simulate loading progress
     const timer = setTimeout(() => {
-      setProgress(25);
+      if (isMounted) setProgress(25);
     }, 500);
 
     const timer2 = setTimeout(() => {
-      setProgress(48);
-      setCurrentText(texts[1]);
+      if (isMounted) {
+        setProgress(48);
+        setCurrentText(texts[1]);
+      }
     }, 1500);
 
     const timer3 = setTimeout(() => {
-      setProgress(75);
-      setCurrentText(texts[2]);
+      if (isMounted) {
+        setProgress(75);
+        setCurrentText(texts[2]);
+      }
     }, 2500);
 
     const timer4 = setTimeout(() => {
-      setProgress(100);
-      setCurrentText(texts[3]);
-      
-      // Mock data retrieval
-      updateUserData({
-        name: 'João Silva Santos',
-        motherName: 'Maria Santos Silva',
-        gender: 'Masculino',
-        income: 'R$ 2.500,00'
-      });
+      if (isMounted) {
+        setProgress(100);
+        setCurrentText(texts[3]);
+        
+        // Mock data retrieval
+        updateUserData({
+          name: 'João Silva Santos',
+          motherName: 'Maria Santos Silva',
+          gender: 'Masculino',
+          income: 'R$ 2.500,00'
+        });
+      }
     }, 3500);
 
     const timer5 = setTimeout(() => {
-      onNext();
+      if (isMounted) {
+        onNext();
+      }
     }, 4500);
 
     return () => {
+      isMounted = false;
       clearTimeout(timer);
       clearTimeout(timer2);
       clearTimeout(timer3);
       clearTimeout(timer4);
       clearTimeout(timer5);
     };
-  }, [onNext, updateUserData]);
+  }, []);
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-md">

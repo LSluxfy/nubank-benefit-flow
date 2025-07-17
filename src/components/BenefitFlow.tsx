@@ -3,6 +3,8 @@ import { StepOne } from './benefit-flow/StepOne';
 import { StepTwo } from './benefit-flow/StepTwo';
 import { StepThree } from './benefit-flow/StepThree';
 import { StepFour } from './benefit-flow/StepFour';
+import { Header } from './layout/Header';
+import { Footer } from './layout/Footer';
 
 export interface UserData {
   cpf: string;
@@ -32,31 +34,37 @@ export const BenefitFlow = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      {currentStep === 1 && (
-        <StepOne 
-          onNext={nextStep} 
-          userData={userData}
-          updateUserData={updateUserData}
-        />
-      )}
-      {currentStep === 2 && (
-        <StepTwo 
-          onNext={nextStep}
-          userData={userData}
-          updateUserData={updateUserData}
-        />
-      )}
-      {currentStep === 3 && (
-        <StepThree 
-          onNext={nextStep}
-          onBack={prevStep}
-          userData={userData}
-        />
-      )}
-      {currentStep === 4 && (
-        <StepFour userData={userData} />
-      )}
+    <div className="min-h-screen bg-background flex flex-col">
+      <Header />
+      
+      <main className="flex-1">
+        {currentStep === 1 && (
+          <StepOne 
+            onNext={nextStep} 
+            userData={userData}
+            updateUserData={updateUserData}
+          />
+        )}
+        {currentStep === 2 && (
+          <StepTwo 
+            onNext={nextStep}
+            userData={userData}
+            updateUserData={updateUserData}
+          />
+        )}
+        {currentStep === 3 && (
+          <StepThree 
+            onNext={nextStep}
+            onBack={prevStep}
+            userData={userData}
+          />
+        )}
+        {currentStep === 4 && (
+          <StepFour userData={userData} />
+        )}
+      </main>
+
+      <Footer />
     </div>
   );
 };
