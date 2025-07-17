@@ -35,23 +35,48 @@ export const StepSix = ({ userData, onNext }: StepSixProps) => {
   const [showPaymentFlow, setShowPaymentFlow] = useState(false);
   const [showPaymentLoading, setShowPaymentLoading] = useState(false);
 
+  // Format name in Hub API pattern (show first part, hide rest with asterisks)
+  const formatNameForOptions = (name: string) => {
+    if (!name) return '';
+    const upperName = name.toUpperCase();
+    const words = upperName.split(' ');
+    
+    if (words.length === 1) {
+      // Single word: show first 6-8 characters, rest as asterisks
+      const visiblePart = words[0].substring(0, Math.min(8, words[0].length));
+      const hiddenLength = Math.max(0, words[0].length - visiblePart.length);
+      return visiblePart + '*'.repeat(Math.max(15, hiddenLength));
+    } else {
+      // Multiple words: show first word and part of second, rest as asterisks
+      const firstWord = words[0];
+      const secondWord = words[1] || '';
+      const visibleSecond = secondWord.substring(0, Math.min(7, secondWord.length));
+      const visiblePart = firstWord + (visibleSecond ? ' ' + visibleSecond : '');
+      return visiblePart + '*'.repeat(15);
+    }
+  };
+
   // Generate dynamic options for mother's name question
   const generateMotherNameOptions = () => {
     const correctAnswer = userData.motherName;
-    const fakeOptions = [
-      'Raquel Queiroz Santos',
-      'Fernanda de Souza Rodrigues', 
-      'Eliete Aparecida Da Silva Souza',
-      'Maria das Graças Silva'
+    const fakeNames = [
+      'RAQUEL QUEIROZ SANTOS',
+      'FERNANDA DE SOUZA RODRIGUES', 
+      'ELIETE APARECIDA DA SILVA SOUZA',
+      'MARIA DAS GRAÇAS SILVA'
     ];
     
+    // Format all names including the correct one
+    const formattedCorrect = formatNameForOptions(correctAnswer || '');
+    const formattedFakes = fakeNames.map(name => formatNameForOptions(name));
+    
     // Remove any fake option that might match the correct answer
-    const filteredFakeOptions = fakeOptions.filter(option => 
-      option.toLowerCase() !== correctAnswer?.toLowerCase()
+    const filteredFakeOptions = formattedFakes.filter(option => 
+      option !== formattedCorrect
     );
     
     // Take first 3 fake options and add the correct answer
-    const options = [...filteredFakeOptions.slice(0, 3), correctAnswer];
+    const options = [...filteredFakeOptions.slice(0, 3), formattedCorrect];
     
     // Shuffle the options
     return options.sort(() => Math.random() - 0.5);
@@ -186,8 +211,8 @@ export const StepSix = ({ userData, onNext }: StepSixProps) => {
   const handleOptionSelect = (messageId: number, option: string) => {
     // Validate answers for mother's name and birth date questions
     if (messageId === 6) { // Mother's name question
-      const correctAnswer = userData.motherName;
-      if (option.toLowerCase() !== correctAnswer?.toLowerCase()) {
+      const correctAnswer = formatNameForOptions(userData.motherName || '');
+      if (option !== correctAnswer) {
         setWrongAnswers(prev => ({ ...prev, [messageId]: true }));
         return; // Don't proceed if wrong answer
       }
