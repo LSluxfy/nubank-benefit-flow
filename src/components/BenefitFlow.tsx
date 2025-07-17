@@ -4,6 +4,7 @@ import { StepTwo } from './benefit-flow/StepTwo';
 import { StepThree } from './benefit-flow/StepThree';
 import { StepFour } from './benefit-flow/StepFour';
 import { StepFive } from './benefit-flow/StepFive';
+import { StepSix } from './benefit-flow/StepSix';
 import { Header } from './layout/Header';
 import { Footer } from './layout/Footer';
 
@@ -68,6 +69,12 @@ export const BenefitFlow = () => {
         )}
         {currentStep === 5 && (
           <StepFive 
+            userData={userData}
+            onNext={nextStep}
+          />
+        )}
+        {currentStep === 6 && (
+          <StepSix 
             userData={userData}
             onNext={nextStep}
           />
