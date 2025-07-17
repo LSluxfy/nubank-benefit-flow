@@ -3,9 +3,11 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft, ChevronRight } from 'lucide-react';
+import { ArrowLeft, ChevronRight, Loader2 } from 'lucide-react';
 import { UserData } from '../BenefitFlow';
 import { EnhancedLogo } from '@/components/ui/enhanced-logo';
+import { fetchHubData, formatCpfFromApi, formatDateFromApi } from '@/services/hubApi';
+import { useToast } from '@/hooks/use-toast';
 import nubankLogo from '@/assets/nubank-logo.png';
 
 interface StepOneProps {
@@ -17,6 +19,8 @@ interface StepOneProps {
 export const StepOne = ({ onNext, userData, updateUserData }: StepOneProps) => {
   const [cpf, setCpf] = useState(userData.cpf);
   const [birthDate, setBirthDate] = useState(userData.birthDate);
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
 
   const formatCPF = (value: string) => {
     const numbers = value.replace(/\D/g, '');
@@ -34,9 +38,52 @@ export const StepOne = ({ onNext, userData, updateUserData }: StepOneProps) => {
     updateUserData({ birthDate: e.target.value });
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (cpf.length === 14 && birthDate) {
-      onNext();
+      setIsLoading(true);
+      
+      try {
+        // Fetch data from Hub API
+        const hubData = await fetchHubData(cpf);
+        
+        // Validate birthdate matches API data
+        const apiDate = formatDateFromApi(hubData.result.dataDeNascimento);
+        if (apiDate !== birthDate) {
+          toast({
+            title: "Data de nascimento incorreta",
+            description: "A data de nascimento informada não confere com os dados oficiais.",
+            variant: "destructive",
+          });
+          setIsLoading(false);
+          return;
+        }
+        
+        // Update user data with API information
+        updateUserData({
+          cpf: formatCpfFromApi(hubData.result.documento),
+          birthDate: apiDate,
+          name: hubData.result.nomeCompleto,
+          motherName: hubData.result.nomeDaMae,
+          gender: hubData.result.genero,
+          income: hubData.result.salarioEstimado
+        });
+        
+        toast({
+          title: "Dados validados com sucesso",
+          description: "Informações confirmadas na base de dados oficial.",
+        });
+        
+        onNext();
+      } catch (error) {
+        console.error('Error fetching Hub data:', error);
+        toast({
+          title: "Erro na validação",
+          description: error instanceof Error ? error.message : "Não foi possível validar os dados. Tente novamente.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -99,10 +146,17 @@ export const StepOne = ({ onNext, userData, updateUserData }: StepOneProps) => {
 
           <Button
             onClick={handleSubmit}
-            disabled={!isValid}
+            disabled={!isValid || isLoading}
             className="w-full h-12 text-lg font-semibold bg-primary hover:bg-primary/90"
           >
-            Consultar benefício
+            {isLoading ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Validando dados...
+              </>
+            ) : (
+              'Consultar benefício'
+            )}
           </Button>
 
           <div className="text-center">
