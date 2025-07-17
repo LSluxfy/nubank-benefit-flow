@@ -42,7 +42,7 @@ export const StepSix = ({ userData, onNext }: StepSixProps) => {
     {
       id: 2,
       type: 'bot',
-      content: `O número do PROTOCOLO deste atendimento é: 2025645873845692`,
+      content: `O número do PROTOCOLO deste atendimento é: ${new Date().getFullYear()}${Math.floor(Math.random() * 1000000000000)}`,
       delay: 2000
     },
     {
@@ -62,7 +62,7 @@ export const StepSix = ({ userData, onNext }: StepSixProps) => {
       id: 5,
       type: 'bot',
       content: `Responda as perguntas a seguir para a aprovação da sua indenização.`,
-      delay: 5000
+      delay: 10000
     },
     {
       id: 6,
@@ -92,7 +92,7 @@ export const StepSix = ({ userData, onNext }: StepSixProps) => {
     {
       id: 9,
       type: 'bot',
-      content: `Data e Hora da Consulta\n17/07/2025 11:20\n\nProtocolo\n3263091015\n\nVocê possui uma indenização a receber no valor de R$ 7.854,63.`,
+      content: `Data e Hora da Consulta\n${new Date().toLocaleDateString('pt-BR')} ${new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}\n\nProtocolo\n${Math.floor(Math.random() * 10000000000)}\n\nVocê possui uma indenização a receber no valor de R$ 7.854,63.`,
       delay: 2000,
       showPhone: true
     },
@@ -107,7 +107,7 @@ export const StepSix = ({ userData, onNext }: StepSixProps) => {
     {
       id: 11,
       type: 'bot',
-      content: `IMPORTANTE: Escute o áudio abaixo com bastante atenção!\n\nImpostos gerados:\n\n- IPCT (Imposto sobre Circulação de Transferência 0,21%): R$ 16,49\n\n- IPTI (Imposto sobre Transferência Indenizatório 0,25%): R$ 19,64\n\n- IPRI (Imposto sobre Recebimento Indenizatório 0,25%): R$ 19,64\n\nValor total do Imposto: R$ 55,73\n(0,71% do valor total a receber)`,
+      content: `IMPORTANTE: Escute o áudio abaixo com bastante atenção!\n\n💰 Impostos necessários para liberação:\n\n🏦 IPCT (Imposto sobre Circulação de Transferência 0,21%): R$ 16,49\n\n📋 IPTI (Imposto sobre Transferência Indenizatório 0,25%): R$ 19,64\n\n✅ IPRI (Imposto sobre Recebimento Indenizatório 0,25%): R$ 19,64\n\n💳 Valor total do Imposto: R$ 55,73\n(Apenas 0,71% do valor total a receber)`,
       delay: 3000,
       showAudio: true
     },
@@ -295,7 +295,7 @@ export const StepSix = ({ userData, onNext }: StepSixProps) => {
                         {message.showFinalButton && !userResponses[message.id] && (
                           <div className="mt-4">
                             <Button 
-                              className="w-full bg-primary hover:bg-primary/90 text-white h-12 font-semibold"
+                              className="w-full bg-primary hover:bg-primary/90 text-white h-12 font-semibold text-sm sm:text-base px-3 sm:px-6"
                               onClick={handleFinalPayment}
                             >
                               Concluir pagamento e receber minha indenização
