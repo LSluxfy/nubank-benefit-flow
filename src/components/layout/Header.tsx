@@ -1,5 +1,6 @@
 import { Menu, Search, User, MoreVertical, User2, Grid3X3, Palette } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import nubankLogo from '@/assets/nubank-logo.png';
 
 export const Header = () => {
   return (
@@ -8,7 +9,7 @@ export const Header = () => {
       <div className="flex items-center justify-between px-4 py-3">
         {/* Logo */}
         <div className="flex items-center gap-4">
-          <div className="text-3xl font-bold" style={{ color: '#8A05BE' }}>nu</div>
+          <img src={nubankLogo} alt="Nubank" className="h-8" />
         </div>
 
         {/* Right Icons */}
