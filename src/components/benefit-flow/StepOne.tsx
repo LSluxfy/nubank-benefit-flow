@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ArrowLeft, ChevronRight } from 'lucide-react';
 import { UserData } from '../BenefitFlow';
+import { EnhancedLogo } from '@/components/ui/enhanced-logo';
 import nubankLogo from '@/assets/nubank-logo.png';
 
 interface StepOneProps {
@@ -58,8 +59,13 @@ export const StepOne = ({ onNext, userData, updateUserData }: StepOneProps) => {
       {/* Main Card */}
       <Card className="border-0 shadow-lg">
         <CardHeader className="text-center pb-4">
-          <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-            <img src={nubankLogo} alt="Nubank" className="w-8 h-8" />
+          <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+            <EnhancedLogo 
+              src={nubankLogo} 
+              alt="Nubank" 
+              size="lg"
+              removeBackground={true}
+            />
           </div>
           <h1 className="text-2xl font-bold">Consulta de benefício</h1>
           <p className="text-muted-foreground">
