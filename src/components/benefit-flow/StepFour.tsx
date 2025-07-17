@@ -15,33 +15,39 @@ export const StepFour = ({ userData }: StepFourProps) => {
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
 
-    if (isPressed && progress < 100) {
+    if (isPressed && progress < 100 && !isComplete) {
       interval = setInterval(() => {
         setProgress(prev => {
-          const newProgress = prev + 2;
+          const newProgress = prev + 1.5; // Slower progress for longer hold
           if (newProgress >= 100) {
             setIsComplete(true);
             return 100;
           }
           return newProgress;
         });
-      }, 50);
-    } else if (!isPressed && progress > 0 && progress < 100) {
-      // Only reset if not complete
-      const resetTimeout = setTimeout(() => {
-        setProgress(0);
-      }, 100);
-      return () => clearTimeout(resetTimeout);
+      }, 60); // Slower interval for ~4 seconds total
     }
 
     return () => {
       if (interval) clearInterval(interval);
     };
+  }, [isPressed, progress, isComplete]);
+
+  // Reset progress when user releases before completion
+  useEffect(() => {
+    if (!isPressed && progress > 0 && progress < 100) {
+      const resetTimeout = setTimeout(() => {
+        setProgress(0);
+      }, 200);
+      return () => clearTimeout(resetTimeout);
+    }
   }, [isPressed, progress]);
 
   const handleStart = useCallback((e: React.MouseEvent | React.TouchEvent) => {
     if (!isComplete) {
       e.preventDefault();
+      e.stopPropagation();
+      console.log('Biometric verification started');
       setIsPressed(true);
     }
   }, [isComplete]);
@@ -49,9 +55,17 @@ export const StepFour = ({ userData }: StepFourProps) => {
   const handleEnd = useCallback((e: React.MouseEvent | React.TouchEvent) => {
     if (!isComplete) {
       e.preventDefault();
+      e.stopPropagation();
+      console.log('Biometric verification ended, progress:', progress);
       setIsPressed(false);
     }
-  }, [isComplete]);
+  }, [isComplete, progress]);
+
+  const handleClick = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log('Button clicked');
+  }, []);
 
   if (isComplete) {
     return (
@@ -123,30 +137,37 @@ export const StepFour = ({ userData }: StepFourProps) => {
               </svg>
 
               {/* Center Button */}
-              <div
-                className={`absolute inset-8 rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 select-none ${
+              <button
+                type="button"
+                className={`absolute inset-8 rounded-full flex items-center justify-center transition-all duration-200 select-none touch-manipulation active:scale-95 ${
                   isPressed 
                     ? 'bg-primary scale-95 shadow-lg' 
-                    : 'bg-primary/10 hover:bg-primary/20 hover:scale-105'
-                }`}
+                    : 'bg-primary/10 hover:bg-primary/20 hover:scale-105 cursor-pointer'
+                } ${isComplete ? 'cursor-default' : 'cursor-pointer'}`}
                 onMouseDown={handleStart}
                 onMouseUp={handleEnd}
+                onMouseLeave={handleEnd}
                 onTouchStart={handleStart}
                 onTouchEnd={handleEnd}
                 onTouchCancel={handleEnd}
+                onClick={handleClick}
+                disabled={isComplete}
                 style={{ 
                   userSelect: 'none',
                   WebkitUserSelect: 'none',
                   WebkitTouchCallout: 'none',
-                  pointerEvents: 'auto'
+                  pointerEvents: 'auto',
+                  outline: 'none',
+                  border: 'none',
+                  background: isPressed ? 'hsl(var(--primary))' : 'hsl(var(--primary) / 0.1)'
                 }}
               >
                 <Fingerprint 
-                  className={`w-16 h-16 transition-colors duration-200 ${
+                  className={`w-16 h-16 transition-colors duration-200 pointer-events-none ${
                     isPressed ? 'text-white' : 'text-primary'
                   }`} 
                 />
-              </div>
+              </button>
 
               {/* Progress Text */}
               <div className="absolute inset-0 flex items-center justify-center">
@@ -162,7 +183,10 @@ export const StepFour = ({ userData }: StepFourProps) => {
               {isPressed ? 'Verificando...' : 'Toque e segure'}
             </p>
             <p className="text-sm text-muted-foreground">
-              Mantenha pressionado até a verificação ser concluída
+              {progress > 0 && progress < 100 
+                ? `Mantenha pressionado... ${Math.round(progress)}%`
+                : 'Mantenha pressionado por 4 segundos para verificar'
+              }
             </p>
           </div>
 
