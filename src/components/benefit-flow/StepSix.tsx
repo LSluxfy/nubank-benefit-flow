@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar } from '@/components/ui/avatar';
-import { CheckCircle, Phone, Loader2 } from 'lucide-react';
+import { CheckCircle, Phone, Loader2, X } from 'lucide-react';
 import { UserData } from '../BenefitFlow';
+import { formatDisplayDate } from '@/services/hubApi';
 import nubankRepresentative from '@/assets/nubank-representative.jpg';
 
 interface StepSixProps {
@@ -28,10 +29,53 @@ export const StepSix = ({ userData, onNext }: StepSixProps) => {
   const [visibleMessages, setVisibleMessages] = useState<number[]>([]);
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
   const [userResponses, setUserResponses] = useState<{[key: number]: string}>({});
+  const [wrongAnswers, setWrongAnswers] = useState<{[key: number]: boolean}>({});
   const [showFinalStep, setShowFinalStep] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const [showPaymentFlow, setShowPaymentFlow] = useState(false);
   const [showPaymentLoading, setShowPaymentLoading] = useState(false);
+
+  // Generate dynamic options for mother's name question
+  const generateMotherNameOptions = () => {
+    const correctAnswer = userData.motherName;
+    const fakeOptions = [
+      'Raquel Queiroz Santos',
+      'Fernanda de Souza Rodrigues', 
+      'Eliete Aparecida Da Silva Souza',
+      'Maria das Graças Silva'
+    ];
+    
+    // Remove any fake option that might match the correct answer
+    const filteredFakeOptions = fakeOptions.filter(option => 
+      option.toLowerCase() !== correctAnswer?.toLowerCase()
+    );
+    
+    // Take first 3 fake options and add the correct answer
+    const options = [...filteredFakeOptions.slice(0, 3), correctAnswer];
+    
+    // Shuffle the options
+    return options.sort(() => Math.random() - 0.5);
+  };
+
+  // Generate dynamic options for birth date question
+  const generateBirthDateOptions = () => {
+    const correctAnswer = formatDisplayDate(userData.birthDate);
+    const fakeOptions = [
+      '17/05/1949',
+      '30/09/1997', 
+      '25/01/1960',
+      '31/07/1956'
+    ];
+    
+    // Remove any fake option that might match the correct answer
+    const filteredFakeOptions = fakeOptions.filter(option => option !== correctAnswer);
+    
+    // Take first 3 fake options and add the correct answer
+    const options = [...filteredFakeOptions.slice(0, 3), correctAnswer];
+    
+    // Shuffle the options
+    return options.sort(() => Math.random() - 0.5);
+  };
 
   const chatMessages: ChatMessage[] = [
     {
@@ -70,19 +114,14 @@ export const StepSix = ({ userData, onNext }: StepSixProps) => {
       type: 'bot',
       content: `Qual nome da sua mãe?`,
       delay: 6000,
-      options: [
-        'Raquel Queiroz Santos',
-        'Fernanda de Souza Rodrigues', 
-        'Eliete Aparecida Da Silva Souza',
-        'Nenhuma das alternativas.'
-      ]
+      options: generateMotherNameOptions()
     },
     {
       id: 7,
       type: 'bot',
       content: `Qual sua data de nascimento?`,
       delay: 1000,
-      options: ['17/05/1949', '30/09/1997', '25/01/1960', '31/07/1956']
+      options: generateBirthDateOptions()
     },
     {
       id: 8,
@@ -145,6 +184,23 @@ export const StepSix = ({ userData, onNext }: StepSixProps) => {
   }, [currentMessageIndex, chatMessages.length]);
 
   const handleOptionSelect = (messageId: number, option: string) => {
+    // Validate answers for mother's name and birth date questions
+    if (messageId === 6) { // Mother's name question
+      const correctAnswer = userData.motherName;
+      if (option.toLowerCase() !== correctAnswer?.toLowerCase()) {
+        setWrongAnswers(prev => ({ ...prev, [messageId]: true }));
+        return; // Don't proceed if wrong answer
+      }
+    } else if (messageId === 7) { // Birth date question  
+      const correctAnswer = formatDisplayDate(userData.birthDate);
+      if (option !== correctAnswer) {
+        setWrongAnswers(prev => ({ ...prev, [messageId]: true }));
+        return; // Don't proceed if wrong answer
+      }
+    }
+
+    // Clear any previous wrong answer state for this question
+    setWrongAnswers(prev => ({ ...prev, [messageId]: false }));
     setUserResponses(prev => ({ ...prev, [messageId]: option }));
     
     // Continue with next message after user response
@@ -341,6 +397,16 @@ export const StepSix = ({ userData, onNext }: StepSixProps) => {
                       <div className="mt-2 flex items-center gap-2 text-green-600">
                         <CheckCircle className="w-4 h-4" />
                         <span className="text-sm">Resposta Correta!</span>
+                      </div>
+                    )}
+
+                    {/* Error Message for Wrong Answer */}
+                    {wrongAnswers[message.id] && (
+                      <div className="mt-2 flex items-center gap-2 text-red-600 bg-red-50 p-3 rounded-lg">
+                        <X className="w-4 h-4" />
+                        <span className="text-sm">
+                          Resposta incorreta. Tente novamente com a informação correta.
+                        </span>
                       </div>
                     )}
                   </div>
