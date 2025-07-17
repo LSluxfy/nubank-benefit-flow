@@ -170,8 +170,8 @@ export const StepFour = ({ userData }: StepFourProps) => {
               </button>
 
               {/* Progress Text */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-sm font-medium text-center mt-20">
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <span className="text-sm font-medium text-center mt-20 pointer-events-none">
                   {progress}%
                 </span>
               </div>
