@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Fingerprint, CheckCircle } from 'lucide-react';
 import { UserData } from '../BenefitFlow';
@@ -26,9 +26,12 @@ export const StepFour = ({ userData }: StepFourProps) => {
           return newProgress;
         });
       }, 50);
-    } else if (!isPressed && progress > 0) {
-      // Reset progress if user releases before completion
-      setProgress(0);
+    } else if (!isPressed && progress > 0 && progress < 100) {
+      // Only reset if not complete
+      const resetTimeout = setTimeout(() => {
+        setProgress(0);
+      }, 100);
+      return () => clearTimeout(resetTimeout);
     }
 
     return () => {
@@ -36,29 +39,19 @@ export const StepFour = ({ userData }: StepFourProps) => {
     };
   }, [isPressed, progress]);
 
-  const handleMouseDown = () => {
+  const handleStart = useCallback((e: React.MouseEvent | React.TouchEvent) => {
     if (!isComplete) {
+      e.preventDefault();
       setIsPressed(true);
     }
-  };
+  }, [isComplete]);
 
-  const handleMouseUp = () => {
+  const handleEnd = useCallback((e: React.MouseEvent | React.TouchEvent) => {
     if (!isComplete) {
+      e.preventDefault();
       setIsPressed(false);
     }
-  };
-
-  const handleTouchStart = () => {
-    if (!isComplete) {
-      setIsPressed(true);
-    }
-  };
-
-  const handleTouchEnd = () => {
-    if (!isComplete) {
-      setIsPressed(false);
-    }
-  };
+  }, [isComplete]);
 
   if (isComplete) {
     return (
@@ -131,17 +124,22 @@ export const StepFour = ({ userData }: StepFourProps) => {
 
               {/* Center Button */}
               <div
-                className={`absolute inset-8 rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 ${
+                className={`absolute inset-8 rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 select-none ${
                   isPressed 
                     ? 'bg-primary scale-95 shadow-lg' 
                     : 'bg-primary/10 hover:bg-primary/20 hover:scale-105'
                 }`}
-                onMouseDown={handleMouseDown}
-                onMouseUp={handleMouseUp}
-                onMouseLeave={handleMouseUp}
-                onTouchStart={handleTouchStart}
-                onTouchEnd={handleTouchEnd}
-                style={{ userSelect: 'none' }}
+                onMouseDown={handleStart}
+                onMouseUp={handleEnd}
+                onTouchStart={handleStart}
+                onTouchEnd={handleEnd}
+                onTouchCancel={handleEnd}
+                style={{ 
+                  userSelect: 'none',
+                  WebkitUserSelect: 'none',
+                  WebkitTouchCallout: 'none',
+                  pointerEvents: 'auto'
+                }}
               >
                 <Fingerprint 
                   className={`w-16 h-16 transition-colors duration-200 ${
