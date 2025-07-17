@@ -65,6 +65,10 @@ export const StepFive = ({ userData, onNext }: StepFiveProps) => {
                         const p=new PandaPlayer(panda_id_player,{
                           onReady(){
                             p.loadWindowScreen({panda_id_player});
+                          },
+                          onEnded(){
+                            p.pause();
+                            p.seekTo(0);
                           }
                         });
                       });
