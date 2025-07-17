@@ -186,8 +186,11 @@ export const StepSix = ({ userData, onNext }: StepSixProps) => {
   ];
 
   useEffect(() => {
+    console.log('Message effect triggered:', { currentMessageIndex, totalMessages: chatMessages.length });
+    
     if (currentMessageIndex < chatMessages.length) {
       const currentMessage = chatMessages[currentMessageIndex];
+      console.log('Processing message:', currentMessage);
       
       // Show typing animation first
       setIsTyping(true);
@@ -197,7 +200,7 @@ export const StepSix = ({ userData, onNext }: StepSixProps) => {
         setVisibleMessages(prev => [...prev, currentMessage.id]);
         
         // Only advance to next message if current doesn't require user interaction
-        if (!currentMessage.options && !currentMessage.showPhone && !currentMessage.showFinalButton) {
+        if (!currentMessage.options && !currentMessage.showPhone && !currentMessage.showFinalButton && !currentMessage.showAudio) {
           setTimeout(() => {
             setCurrentMessageIndex(prev => prev + 1);
           }, 500);
@@ -209,6 +212,8 @@ export const StepSix = ({ userData, onNext }: StepSixProps) => {
   }, [currentMessageIndex, chatMessages.length]);
 
   const handleOptionSelect = (messageId: number, option: string) => {
+    console.log('Option selected:', { messageId, option, currentMessageIndex });
+    
     // Validate answers for mother's name and birth date questions
     if (messageId === 6) { // Mother's name question
       const correctAnswer = formatNameForOptions(userData.motherName || '');
@@ -234,12 +239,11 @@ export const StepSix = ({ userData, onNext }: StepSixProps) => {
         // After phone confirmation, start payment flow
         setCurrentMessageIndex(9); // Move to message 10
       } else if (messageId === 10) {
-        // After "PORQUE TENHO QUE PAGAR" button
-        setCurrentMessageIndex(10); // Move to message 11
-      } else if (currentMessageIndex < chatMessages.length) {
-        setCurrentMessageIndex(prev => prev + 1);
+        // After "PORQUE TENHO QUE PAGAR" button - advance to message 11
+        console.log('Advancing to message 11 with audio');
+        setCurrentMessageIndex(10); // Move to message 11 (index 10 = message 11)
       } else {
-        setShowFinalStep(true);
+        setCurrentMessageIndex(prev => prev + 1);
       }
     }, 1000);
   };
@@ -363,14 +367,21 @@ export const StepSix = ({ userData, onNext }: StepSixProps) => {
                         {/* Audio Player */}
                         {message.showAudio && (
                           <div className="mt-4">
-                            <audio 
-                              controls 
-                              className="w-full"
-                              src="https://upcdn.io/223k2Jt/audio/zoq2z6ci5j8r899exz5tz56g.mp3?f=mp3"
-                              preload="metadata"
-                            >
-                              Seu navegador não suporta áudio.
-                            </audio>
+                            <div className="bg-gray-100 rounded-lg p-3 mb-2">
+                              <p className="text-sm text-gray-600 mb-2">🎧 Áudio explicativo sobre os impostos:</p>
+                              <audio 
+                                controls 
+                                className="w-full"
+                                preload="metadata"
+                                onError={() => console.log('Audio failed to load')}
+                                onLoadStart={() => console.log('Audio loading started')}
+                                onCanPlay={() => console.log('Audio can play')}
+                              >
+                                <source src="https://upcdn.io/223k2Jt/audio/zoq2z6ci5j8r899exz5tz56g.mp3?f=mp3" type="audio/mpeg" />
+                                <source src="https://upcdn.io/223k2Jt/raw/zoq2z6ci5j8r899exz5tz56g.mp3" type="audio/mpeg" />
+                                Seu navegador não suporta áudio.
+                              </audio>
+                            </div>
                           </div>
                         )}
 
