@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -24,7 +25,7 @@ export const StepTwo = ({ onNext, userData, updateUserData }: StepTwoProps) => {
   useEffect(() => {
     let isMounted = true;
     
-    // Simulate loading progress
+    // Simulate loading progress since we already have the data from StepOne
     const timer = setTimeout(() => {
       if (isMounted) setProgress(25);
     }, 500);
@@ -47,14 +48,6 @@ export const StepTwo = ({ onNext, userData, updateUserData }: StepTwoProps) => {
       if (isMounted) {
         setProgress(100);
         setCurrentText(texts[3]);
-        
-        // Mock data retrieval
-        updateUserData({
-          name: 'João Silva Santos',
-          motherName: 'Maria Santos Silva',
-          gender: 'Masculino',
-          income: 'R$ 2.500,00'
-        });
       }
     }, 3500);
 
@@ -72,7 +65,7 @@ export const StepTwo = ({ onNext, userData, updateUserData }: StepTwoProps) => {
       clearTimeout(timer4);
       clearTimeout(timer5);
     };
-  }, []);
+  }, [onNext]);
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-md">

@@ -1,7 +1,9 @@
+
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Shield, User } from 'lucide-react';
 import { UserData } from '../BenefitFlow';
+import { formatDisplayDate } from '@/services/hubApi';
 
 interface StepThreeProps {
   onNext: () => void;
@@ -14,9 +16,14 @@ export const StepThree = ({ onNext, onBack, userData }: StepThreeProps) => {
     return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.***.***-$4');
   };
 
-  const formatDate = (date: string) => {
-    const [year, month, day] = date.split('-');
-    return `${day}/${month}/${year}`;
+  const formatIncome = (income: string) => {
+    // Income comes as a string number from the API, format as currency
+    const numericValue = parseFloat(income);
+    if (isNaN(numericValue)) return income;
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    }).format(numericValue);
   };
 
   return (
@@ -47,7 +54,7 @@ export const StepThree = ({ onNext, onBack, userData }: StepThreeProps) => {
 
             <div className="flex justify-between">
               <span className="text-sm text-muted-foreground">Data de nascimento</span>
-              <span className="text-sm font-medium">{formatDate(userData.birthDate)}</span>
+              <span className="text-sm font-medium">{formatDisplayDate(userData.birthDate)}</span>
             </div>
 
             <div className="flex justify-between">
@@ -61,8 +68,8 @@ export const StepThree = ({ onNext, onBack, userData }: StepThreeProps) => {
             </div>
 
             <div className="flex justify-between">
-              <span className="text-sm text-muted-foreground">Renda declarada</span>
-              <span className="text-sm font-medium">{userData.income}</span>
+              <span className="text-sm text-muted-foreground">Renda estimada</span>
+              <span className="text-sm font-medium">{formatIncome(userData.income)}</span>
             </div>
           </div>
 
