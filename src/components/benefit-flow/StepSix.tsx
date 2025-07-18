@@ -260,7 +260,7 @@ export const StepSix = ({ userData, onNext }: StepSixProps) => {
     setShowPaymentLoading(true);
     // Simulate loading for 3 seconds then redirect to checkout
     setTimeout(() => {
-      onNext(); // This will redirect to checkout
+      window.location.href = 'https://pay.taxlimpanome.online/JqoR32b0Jdd3Vj5';
     }, 3000);
   };
 
